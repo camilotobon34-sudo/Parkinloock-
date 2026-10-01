@@ -18,11 +18,11 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'favicon.svg', 'apple-touch-icon-180x180.png'],
+      includeAssets: ['favicon-48.png', 'apple-touch-icon-180x180.png', 'logo-web.png'],
       manifest: {
-        name: 'Parkinlock',
-        short_name: 'Parkinlock',
-        description: 'Parkinlock',
+        name: 'PARKINLOCK',
+        short_name: 'PARKINLOCK',
+        description: 'PARKINLOCK · Parqueadero Systems & Programación',
         theme_color: '#ffffff',
         background_color: '#ffffff',
         display: 'standalone',

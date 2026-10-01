@@ -41,10 +41,10 @@ export function Layout() {
     <div className={`app ${abierto ? 'menu-abierto' : ''}`}>
       <aside className="sidebar">
         <div className="marca">
-          <span className="marca-logo">P</span>
+          <img src="/logo-icono.png" alt="" className="marca-img" />
           <div>
             <strong>PARKINLOCK</strong>
-            <small>Gestión de parqueadero</small>
+            <small>Systems &amp; Programación</small>
           </div>
         </div>
         <nav>

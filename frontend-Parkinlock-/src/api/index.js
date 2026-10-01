@@ -1,4 +1,5 @@
-export { api, ApiError, clearToken, getToken, onNoAutorizado, setToken } from './client.js'
+export { api, ApiError, clearKioscoToken, clearToken, getKioscoToken, getToken, onNoAutorizado, setKioscoToken, setToken } from './client.js'
+export * as kiosco from './kiosco.js'
 export * as auth from './auth.js'
 export * as usuarios from './usuarios.js'
 export * as clientes from './clientes.js'

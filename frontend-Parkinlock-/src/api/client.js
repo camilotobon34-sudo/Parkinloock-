@@ -1,5 +1,6 @@
 const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '')
 const TOKEN_KEY = 'parkinlock_token'
+const KIOSCO_KEY = 'parkinlock_kiosco'
 
 export class ApiError extends Error {
   constructor(status, message, detalles) {
@@ -24,6 +25,11 @@ export function clearToken() {
   sessionStorage.removeItem(TOKEN_KEY)
 }
 
+/** Sesión del trabajador que activó el autoservicio en este equipo; sobrevive al cierre de sesión. */
+export const getKioscoToken = () => localStorage.getItem(KIOSCO_KEY)
+export const setKioscoToken = (token) => token && localStorage.setItem(KIOSCO_KEY, token)
+export const clearKioscoToken = () => localStorage.removeItem(KIOSCO_KEY)
+
 function conQuery(path, params) {
   if (!params) return path
   const q = new URLSearchParams()
@@ -32,9 +38,9 @@ function conQuery(path, params) {
   return s ? `${path}?${s}` : path
 }
 
-export async function request(method, path, { body, params } = {}) {
+export async function request(method, path, { body, params, kiosco = false } = {}) {
   const headers = { Accept: 'application/json' }
-  const token = getToken()
+  const token = kiosco ? getKioscoToken() : getToken()
   if (token) headers.Authorization = `Bearer ${token}`
   if (body !== undefined) headers['Content-Type'] = 'application/json'
 
@@ -60,7 +66,8 @@ export async function request(method, path, { body, params } = {}) {
   }
   if (!res.ok) {
     const mensaje = data?.error || `Error ${res.status}`
-    if (res.status === 401 && path !== '/auth/login') alNoAutorizado(mensaje)
+    if (res.status === 401 && kiosco) clearKioscoToken()
+    else if (res.status === 401 && path !== '/auth/login') alNoAutorizado(mensaje)
     throw new ApiError(res.status, mensaje, data?.detalles)
   }
   return data
