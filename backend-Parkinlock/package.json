@@ -1,0 +1,32 @@
+{
+  "name": "backend-parkinlock",
+  "version": "1.0.0",
+  "description": "API REST de PARKINLOCK: gestión de parqueadero (Node.js + Express + MySQL 8)",
+  "private": true,
+  "type": "module",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test --test-concurrency=1 \"test/**/*.test.js\"",
+    "test:unit": "node --test \"test/unit/*.test.js\"",
+    "check": "node scripts/check-syntax.js",
+    "usuarios:contrasena": "node scripts/asignar-contrasena.js"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.24.5"
+  },
+  "devDependencies": {
+    "mysql-memory-server": "^1.16.0",
+    "supertest": "^7.3.0"
+  }
+}
