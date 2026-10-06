@@ -23,10 +23,10 @@ const NAVEGACION = [
 function Reloj() {
   const [ahora, setAhora] = useState(new Date())
   useEffect(() => {
-    const t = setInterval(() => setAhora(new Date()), 30_000)
+    const t = setInterval(() => setAhora(new Date()), 1_000)
     return () => clearInterval(t)
   }, [])
-  const hh = ahora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', hour12: false })
+  const hh = ahora.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
   const dd = ahora.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()
   return <span className="reloj">{`${hh} · ${dd}`}</span>
 }
@@ -80,7 +80,9 @@ export function Layout() {
           <Reloj />
         </header>
         <main className="contenido">
-          <Outlet />
+          <div key={location.pathname} className="pagina">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
