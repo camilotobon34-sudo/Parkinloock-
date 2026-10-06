@@ -69,14 +69,14 @@ describe('API PARKINLOCK', { skip: motivoOmision }, () => {
   const ctx = {}
 
   test('preparación: contraseñas de los usuarios de prueba', async () => {
-    await query(`UPDATE usuarios SET contrasena_hash = ? WHERE usuario = 'admin'`, [await hashContrasena(CLAVE_ADMIN)])
+    await query(`UPDATE usuarios SET contrasena_hash = ? WHERE usuario = 'lorozcovargas210@gmail.com'`, [await hashContrasena(CLAVE_ADMIN)])
     await query(`UPDATE usuarios SET contrasena_hash = ? WHERE usuario = 'trabajador'`, [await hashContrasena(CLAVE_TRABAJADOR)])
     const salud = await api('get', '/api/salud')
     assert.equal(salud.status, 200)
   })
 
   test('1. login correcto', async () => {
-    const r = await api('post', '/api/auth/login', null, { usuario: 'admin', contrasena: CLAVE_ADMIN, rol: 'ADMINISTRADOR' })
+    const r = await api('post', '/api/auth/login', null, { usuario: 'lorozcovargas210@gmail.com', contrasena: CLAVE_ADMIN, rol: 'ADMINISTRADOR' })
     assert.equal(r.status, 200)
     assert.ok(r.body.token)
     assert.equal(r.body.usuario.rol, 'ADMINISTRADOR')
@@ -91,7 +91,7 @@ describe('API PARKINLOCK', { skip: motivoOmision }, () => {
   })
 
   test('2. login incorrecto', async () => {
-    const mala = await api('post', '/api/auth/login', null, { usuario: 'admin', contrasena: 'incorrecta' })
+    const mala = await api('post', '/api/auth/login', null, { usuario: 'lorozcovargas210@gmail.com', contrasena: 'incorrecta' })
     assert.equal(mala.status, 401)
     assert.equal(mala.body.error, 'Usuario o contraseña incorrectos.')
     const inexistente = await api('post', '/api/auth/login', null, { usuario: 'nadie', contrasena: 'x' })
@@ -352,7 +352,7 @@ describe('API PARKINLOCK', { skip: motivoOmision }, () => {
   })
 
   test('usuarios: estado, rol y protección del último administrador', async () => {
-    const [admin] = await query(`SELECT id_usuario FROM usuarios WHERE usuario = 'admin'`)
+    const [admin] = await query(`SELECT id_usuario FROM usuarios WHERE usuario = 'lorozcovargas210@gmail.com'`)
     const [laura] = await query(`SELECT id_usuario FROM usuarios WHERE usuario = 'laura'`)
     assert.equal((await api('patch', `/api/usuarios/${admin.id_usuario}/estado`, ctx.admin, { estado: 'INACTIVO' })).status, 409)
     assert.equal((await api('put', `/api/usuarios/${admin.id_usuario}`, ctx.admin, { rol: 'TRABAJADOR' })).status, 409)

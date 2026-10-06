@@ -247,11 +247,11 @@ FROM (
 JOIN tipos_vehiculo t ON t.nombre = e.tipo
 ON DUPLICATE KEY UPDATE codigo = espacios.codigo;
 
-INSERT INTO usuarios (id_rol, nombre_completo, usuario, contrasena_hash)
-SELECT r.id_rol, u.nombre_completo, u.usuario, '<hash>'
+INSERT INTO usuarios (id_rol, nombre_completo, usuario, correo, contrasena_hash)
+SELECT r.id_rol, u.nombre_completo, u.usuario, u.correo, u.contrasena_hash
 FROM (
-  SELECT 'ADMINISTRADOR' AS rol, 'Administrador de prueba' AS nombre_completo, 'admin' AS usuario
-  UNION ALL SELECT 'TRABAJADOR', 'Trabajador de prueba', 'trabajador'
+  SELECT 'ADMINISTRADOR' AS rol, 'Loren Orozco Vargas' AS nombre_completo, 'lorozcovargas210@gmail.com' AS usuario, 'lorozcovargas210@gmail.com' AS correo, '$2b$10$wJ2jfAiSs9otaRGPmwkiE.x06/oxKmgZ5oyCS052MS1QFjwydWbUy' AS contrasena_hash
+  UNION ALL SELECT 'TRABAJADOR', 'Trabajador de prueba', 'trabajador', NULL, '<hash>'
 ) AS u
 JOIN roles r ON r.nombre = u.rol
 ON DUPLICATE KEY UPDATE usuario = usuarios.usuario;

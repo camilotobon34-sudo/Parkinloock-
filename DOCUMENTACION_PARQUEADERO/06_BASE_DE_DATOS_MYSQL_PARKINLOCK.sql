@@ -210,6 +210,6 @@ INSERT INTO tarifas (id_tipo_vehiculo, concepto, valor, vigente_desde) VALUES
 INSERT INTO espacios (codigo, id_tipo_vehiculo) VALUES
   ('C-01',1),('C-02',1),('C-12',1),('M-01',2),('M-02',2);
 
-INSERT INTO usuarios (id_rol, nombre_completo, usuario, contrasena_hash) VALUES
-  (1, 'Administrador de prueba', 'admin',      '<hash>'),
-  (2, 'Trabajador de prueba',    'trabajador', '<hash>');
+INSERT INTO usuarios (id_rol, nombre_completo, usuario, correo, contrasena_hash) VALUES
+  (1, 'Loren Orozco Vargas', 'lorozcovargas210@gmail.com', 'lorozcovargas210@gmail.com', '$2b$10$wJ2jfAiSs9otaRGPmwkiE.x06/oxKmgZ5oyCS052MS1QFjwydWbUy'),
+  (2, 'Trabajador de prueba', 'trabajador', NULL, '<hash>');

@@ -43,10 +43,9 @@ backend-Parkinlock/
 
 3. Copiar `.env.example` como `.env` y completar los valores. El archivo `.env` no se sube a Git.
 
-4. Asignar contraseñas a los usuarios de prueba que crea el script (`admin` y `trabajador`). El script los crea con `contrasena_hash = '<hash>'`, por lo que no pueden iniciar sesión hasta este paso:
+4. El administrador inicial es Loren Orozco Vargas (`lorozcovargas210@gmail.com`) y ya puede iniciar sesión. El trabajador de prueba sigue con `contrasena_hash = '<hash>'` hasta asignarle una clave:
 
    ```bash
-   npm run usuarios:contrasena -- admin "UnaClaveSegura"
    npm run usuarios:contrasena -- trabajador "OtraClaveSegura"
    ```
 
@@ -61,7 +60,7 @@ backend-Parkinlock/
 
 ## Autenticación
 
-`POST /api/auth/login` con `{ "usuario": "admin", "contrasena": "...", "rol": "ADMINISTRADOR" }`. El campo `usuario` acepta el usuario o el correo, y `rol` es opcional.
+`POST /api/auth/login` con `{ "usuario": "lorozcovargas210@gmail.com", "contrasena": "...", "rol": "ADMINISTRADOR" }`. El campo `usuario` acepta el usuario o el correo, y `rol` es opcional.
 
 La respuesta trae un `token` (JWT, 8 h por defecto). Envíelo en cada petición con:
 
