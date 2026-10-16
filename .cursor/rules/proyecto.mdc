@@ -1,0 +1,15 @@
+---
+description: Qué es Parkinloock y cómo seguir
+alwaysApply: true
+---
+
+# Parkinloock
+
+El usuario habla en español. Cuando diga «sigamos con el parqueadero» o «Parking Lot», continúa este proyecto.
+
+Sistema de parqueadero para estudiantes, profesores y personal de la institución. Controla cupos y cobra carro o moto por tiempo, por reserva o por mensualidad. El pago es en efectivo y el sistema calcula el cambio.
+
+- Repo de Camilo: https://github.com/camilotobon34-sudo/Parkinloock-
+- Frontend en `frontend-Parkinlock-/`. Backend en `backend-Parkinlock/`.
+- Las reglas de negocio están en `DOCUMENTACION_PARQUEADERO/`.
+- No subas `.env` ni `.env.local`.
