@@ -271,13 +271,25 @@ export function getPool() {
   return pool
 }
 
+function bindSqliteParam(value) {
+  if (value === undefined || value === null) return null
+  if (value instanceof Date) {
+    const pad = (n) => String(n).padStart(2, '0')
+    return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())} ${pad(value.getHours())}:${pad(value.getMinutes())}:${pad(value.getSeconds())}`
+  }
+  if (typeof value === 'boolean') return value ? 1 : 0
+  if (typeof value === 'bigint') return Number(value)
+  return value
+}
+
 function runSqlite(db, sql, params = []) {
   const prepared = db.prepare(toSqliteSql(sql))
+  const bound = params.map(bindSqliteParam)
   const trimmed = sql.trim().toLowerCase()
   if (trimmed.startsWith('select') || trimmed.startsWith('with')) {
-    return prepared.all(...params)
+    return prepared.all(...bound)
   }
-  const info = prepared.run(...params)
+  const info = prepared.run(...bound)
   return {
     insertId: Number(info.lastInsertRowid || 0),
     affectedRows: info.changes || 0,
