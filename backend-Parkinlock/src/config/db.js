@@ -5,9 +5,11 @@ import { tmpdir } from 'node:os'
 import mysql from 'mysql2/promise'
 import { env } from './env.js'
 
+// En Vercel usamos SQLite salvo que se pida MySQL explícitamente (DB_CLIENT=mysql).
 const useSqlite =
   process.env.DB_CLIENT === 'sqlite' ||
-  (Boolean(process.env.VERCEL) && (!process.env.DB_HOST || process.env.DB_HOST === '127.0.0.1'))
+  (Boolean(process.env.VERCEL) && process.env.DB_CLIENT !== 'mysql') ||
+  (!process.env.VERCEL && process.env.DB_CLIENT === 'sqlite')
 
 let pool
 let sqlite
