@@ -13,7 +13,9 @@ export const env = {
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD ?? '',
   },
-  jwtSecret: process.env.JWT_SECRET,
+  jwtSecret:
+    process.env.JWT_SECRET ||
+    (process.env.VERCEL ? 'parkinlock-vercel-demo-jwt-secret-minimo-32-caracteres' : undefined),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '8h',
   corsOrigin:
     process.env.CORS_ORIGIN ||
