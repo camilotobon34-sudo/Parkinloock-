@@ -22,5 +22,10 @@ export function manejarErrores(err, _req, res, _next) {
   if (mysql) return res.status(mysql[0]).json({ error: mysql[1] })
 
   console.error(err)
+  if (err?.code === 'ECONNREFUSED' || err?.code === 'ENOTFOUND' || err?.code === 'ETIMEDOUT') {
+    return res.status(503).json({
+      error: 'No se pudo conectar a la base de datos. Configure DB_HOST, DB_USER, DB_PASSWORD y DB_NAME en Vercel.',
+    })
+  }
   res.status(500).json({ error: 'Error interno del servidor.' })
 }
