@@ -29,6 +29,10 @@ function toSqliteSql(sql) {
   s = s.replace(/\s+ON DUPLICATE KEY UPDATE\s+valor\s*=\s*tarifas\.valor/gi, '')
   s = s.replace(/\s+ON DUPLICATE KEY UPDATE\s+codigo\s*=\s*espacios\.codigo/gi, '')
   s = s.replace(/TIMESTAMPDIFF\(\s*MINUTE\s*,\s*([^,]+)\s*,\s*([^)]+)\)/gi, 'CAST((julianday($2) - julianday($1)) * 1440 AS INTEGER)')
+  s = s.replace(/\bGREATEST\s*\(/gi, 'max(')
+  s = s.replace(/\bLEAST\s*\(/gi, 'min(')
+  s = s.replace(/DATE_FORMAT\s*\(\s*([^,]+)\s*,\s*'%Y-%m-%d'\s*\)/gi, 'strftime(\'%Y-%m-%d\', $1)')
+  s = s.replace(/DATE_FORMAT\s*\(\s*([^,]+)\s*,\s*'%Y-%m-%d %H:%i:%s'\s*\)/gi, 'strftime(\'%Y-%m-%d %H:%M:%S\', $1)')
   s = s.replace(/FIELD\(([^,]+),\s*([\s\S]*?)\)/gi, (_, col, list) => {
     const parts = list.split(',').map((p) => p.trim()).filter(Boolean)
     return `CASE ${col.trim()} ${parts.map((p, i) => `WHEN ${p} THEN ${i}`).join(' ')} ELSE 999 END`
