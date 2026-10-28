@@ -242,11 +242,13 @@ function initSqlite() {
 
     const adminHash = '$2b$10$wJ2jfAiSs9otaRGPmwkiE.x06/oxKmgZ5oyCS052MS1QFjwydWbUy'
     const trabHash = '$2b$10$OfLiddI46Lg01jOvL5N7Wu5IGafZpe//uOY8XlKQMHbwifqruNA8e'
+    // IDs fijos: tras un cold start de Vercel el JWT del admin (sub=1) sigue válido.
     const insUser = sqlite.prepare(
-      'INSERT OR IGNORE INTO usuarios (id_rol, nombre_completo, usuario, correo, contrasena_hash) VALUES (?, ?, ?, ?, ?)',
+      `INSERT OR IGNORE INTO usuarios (id_usuario, id_rol, nombre_completo, usuario, correo, contrasena_hash)
+       VALUES (?, ?, ?, ?, ?, ?)`,
     )
-    insUser.run(idRol.ADMINISTRADOR, 'Loren Orozco Vargas', 'lorozcovargas210@gmail.com', 'lorozcovargas210@gmail.com', adminHash)
-    insUser.run(idRol.TRABAJADOR, 'Trabajador de prueba', 'trabajador', null, trabHash)
+    insUser.run(1, idRol.ADMINISTRADOR, 'Loren Orozco Vargas', 'lorozcovargas210@gmail.com', 'lorozcovargas210@gmail.com', adminHash)
+    insUser.run(2, idRol.TRABAJADOR, 'Trabajador de prueba', 'trabajador', null, trabHash)
 
     const yaDemo = sqlite.prepare(`SELECT valor FROM meta WHERE clave = 'demo_operacion_v1'`).get()
     if (!yaDemo) {

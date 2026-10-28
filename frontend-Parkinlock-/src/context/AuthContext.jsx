@@ -26,10 +26,37 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     onNoAutorizado((mensaje) => logout(mensaje))
-    if (!getToken()) return
-    refrescar()
-      .catch(() => logout())
-      .finally(() => setCargando(false))
+    if (!getToken()) {
+      setCargando(false)
+      return
+    }
+
+    let cancelado = false
+    const verificar = async ({ silencioso = false } = {}) => {
+      try {
+        await refrescar()
+        if (!cancelado) setAviso(null)
+      } catch (err) {
+        if (cancelado) return
+        // Solo cerrar sesión si el token es inválido; errores de red/DB no deben expulsar al operador.
+        if (err?.status === 401) logout(err.message)
+        else if (!silencioso) setAviso(err?.message || 'Conexión inestable. Se reintentará automáticamente.')
+      } finally {
+        if (!cancelado) setCargando(false)
+      }
+    }
+
+    verificar()
+    const id = setInterval(() => verificar({ silencioso: true }), 60_000)
+    const alVisible = () => {
+      if (document.visibilityState === 'visible') verificar({ silencioso: true })
+    }
+    document.addEventListener('visibilitychange', alVisible)
+    return () => {
+      cancelado = true
+      clearInterval(id)
+      document.removeEventListener('visibilitychange', alVisible)
+    }
   }, [logout, refrescar])
 
   const login = useCallback(

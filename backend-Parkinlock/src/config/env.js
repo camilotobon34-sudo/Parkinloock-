@@ -16,7 +16,8 @@ export const env = {
   jwtSecret:
     process.env.JWT_SECRET ||
     (process.env.VERCEL ? 'parkinlock-vercel-demo-jwt-secret-minimo-32-caracteres' : undefined),
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '8h',
+  // En Vercel la sesión debe durar el turno completo; 8h cortaba el acceso al operar.
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || (process.env.VERCEL ? '30d' : '8h'),
   corsOrigin:
     process.env.CORS_ORIGIN ||
     'http://localhost:5173,https://parkinlock.vercel.app,https://parkinlock-six.vercel.app',

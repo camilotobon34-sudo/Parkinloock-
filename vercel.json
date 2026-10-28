@@ -3,6 +3,18 @@
   "installCommand": "npm install --prefix frontend-Parkinlock- && npm install --prefix backend-Parkinlock",
   "buildCommand": "npm run build --prefix frontend-Parkinlock-",
   "outputDirectory": "frontend-Parkinlock-/dist",
+  "functions": {
+    "api/index.mjs": {
+      "maxDuration": 30,
+      "memory": 1024
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/salud",
+      "schedule": "0 8 * * *"
+    }
+  ],
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/(.*)", "destination": "/index.html" }

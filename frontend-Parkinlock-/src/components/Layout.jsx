@@ -33,7 +33,7 @@ function Reloj() {
 }
 
 export function Layout() {
-  const { usuario, esAdmin, turno, logout } = useAuth()
+  const { usuario, esAdmin, turno, logout, aviso } = useAuth()
   const [abierto, setAbierto] = useState(false)
   const location = useLocation()
   useEffect(() => setAbierto(false), [location.pathname])
@@ -84,6 +84,7 @@ export function Layout() {
           <Reloj />
         </header>
         <main className="contenido">
+          {aviso && <div className="aviso aviso-advertencia">{aviso}</div>}
           <div key={location.pathname} className="pagina">
             <Outlet />
           </div>
