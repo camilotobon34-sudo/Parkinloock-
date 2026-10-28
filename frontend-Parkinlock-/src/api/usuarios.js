@@ -1,6 +1,7 @@
 import { api } from './client.js'
 
 export const listar = () => api.get('/usuarios')
+export const personas = () => api.get('/usuarios/personas')
 export const obtener = (id) => api.get(`/usuarios/${id}`)
 export const crear = (datos) => api.post('/usuarios', datos)
 export const actualizar = (id, datos) => api.put(`/usuarios/${id}`, datos)

@@ -2,12 +2,29 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getToken, setKioscoToken } from '../api/index.js'
 import { Autoservicio } from '../components/Autoservicio.jsx'
+import { ZonaCliente } from '../components/ZonaCliente.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 
 /** Pantalla completa de autoservicio. Al abrirla, el trabajador deja activado el modo cliente en este equipo. */
 export default function Cliente() {
-  const { turno } = useAuth()
+  const { usuario, turno, logout } = useAuth()
   const [activado] = useState(() => (turno ? setKioscoToken(getToken()) ?? true : false))
+
+  if (usuario?.rol === 'CLIENTE') {
+    return (
+      <div className="kiosco">
+        <header className="kiosco-cab">
+          <img src="/logo-web.png" alt="Parqueadero Systems & Programación" className="kiosco-logo" />
+          <button type="button" className="btn" onClick={() => logout()}>
+            ← Volver
+          </button>
+        </header>
+        <div className="kiosco-tarjeta kiosco-tarjeta-cliente">
+          <ZonaCliente usuario={usuario} />
+        </div>
+      </div>
+    )
+  }
 
   if (!activado) {
     return (

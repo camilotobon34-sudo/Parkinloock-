@@ -55,7 +55,7 @@ export function exportarCSV(nombre, filas, columnas) {
   URL.revokeObjectURL(url)
 }
 
-export const NOMBRE_ROL = { ADMINISTRADOR: 'Administrador', TRABAJADOR: 'Trabajador' }
+export const NOMBRE_ROL = { ADMINISTRADOR: 'Administrador', TRABAJADOR: 'Trabajador', CLIENTE: 'Cliente' }
 export const NOMBRE_TIPO = { CARRO: 'Carro', MOTO: 'Moto' }
 export const NOMBRE_REGLA = {
   POR_HORAS: 'Hora + fracción',

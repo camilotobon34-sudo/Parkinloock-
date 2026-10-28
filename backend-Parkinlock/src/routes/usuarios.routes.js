@@ -6,6 +6,7 @@ import { soloAdministrador } from '../middleware/auth.js'
 const router = Router()
 router.use(soloAdministrador)
 router.get('/', c.listar)
+router.get('/personas', c.personas)
 router.post('/', c.crear)
 router.get('/:id', c.obtener)
 router.put('/:id', c.actualizar)

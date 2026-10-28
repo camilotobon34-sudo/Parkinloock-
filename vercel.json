@@ -1,0 +1,9 @@
+{
+  "framework": "vite",
+  "installCommand": "npm install --prefix frontend-Parkinlock-",
+  "buildCommand": "npm run build --prefix frontend-Parkinlock-",
+  "outputDirectory": "frontend-Parkinlock-/dist",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

@@ -33,12 +33,25 @@ export async function obtener(idUsuario, conn) {
 
 export const listar = () => query(`${SELECT_USUARIO} ORDER BY u.nombre_completo`)
 
+/** Personas que ingresaron como cliente: usuario, nombre y correo. */
+export const listarPersonas = () => query(`${SELECT_USUARIO} WHERE r.nombre = 'CLIENTE' ORDER BY u.fecha_creacion DESC, u.nombre_completo`)
+
 export async function crear(body = {}) {
   const nombre = texto(body.nombre_completo, 'nombre_completo', { max: 120 })
   const usuario = texto(body.usuario, 'usuario', { max: 50 })
-  if (!/^[A-Za-z0-9._-]+$/.test(usuario)) throw badRequest('El usuario solo puede tener letras, números, punto, guion y guion bajo.')
-  const correo = validarCorreo(body.correo)
   const rol = opcion(body.rol, 'rol', ROLES)
+  if (rol === 'CLIENTE') {
+    if (!/^[A-Za-z0-9._@-]+$/.test(usuario)) throw badRequest('El usuario solo puede tener letras, números, punto, @, guion y guion bajo.')
+  } else if (!/^[A-Za-z0-9._-]+$/.test(usuario)) {
+    throw badRequest('El usuario solo puede tener letras, números, punto, guion y guion bajo.')
+  }
+  const correo = rol === 'CLIENTE' ? texto(body.correo, 'correo', { max: 120 }) : validarCorreo(body.correo)
+  if (correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) throw badRequest('El correo no es válido.')
+  if (rol === 'CLIENTE' && !correo) throw badRequest('El campo correo es obligatorio.')
+  await query(
+    `INSERT INTO roles (nombre, descripcion) VALUES ('CLIENTE', 'Se registra con usuario, nombre, correo y contraseña')
+     ON DUPLICATE KEY UPDATE nombre = nombre`,
+  )
   const hash = await hashContrasena(validarContrasena(body.contrasena))
   const r = await query(
     `INSERT INTO usuarios (id_rol, nombre_completo, usuario, correo, contrasena_hash) VALUES (?, ?, ?, ?, ?)`,

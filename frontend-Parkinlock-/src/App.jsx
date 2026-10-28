@@ -11,6 +11,7 @@ import Historial from './pages/Historial.jsx'
 import Login from './pages/Login.jsx'
 import Mensualidades from './pages/Mensualidades.jsx'
 import Panel from './pages/Panel.jsx'
+import Personas from './pages/Personas.jsx'
 import Reservas from './pages/Reservas.jsx'
 import Salida from './pages/Salida.jsx'
 import Tarifas from './pages/Tarifas.jsx'
@@ -34,7 +35,15 @@ function SoloAdmin({ children }) {
 function RutaLogin() {
   const { usuario, cargando } = useAuth()
   if (cargando) return <Cargando texto="Verificando sesión…" />
-  return usuario ? <Navigate to={sessionStorage.getItem('parkinlock_destino') || '/'} replace /> : <Login />
+  if (!usuario) return <Login />
+  const destino = usuario.rol === 'CLIENTE' ? '/cliente' : sessionStorage.getItem('parkinlock_destino') || '/'
+  return <Navigate to={destino} replace />
+}
+
+function ZonaPersonal() {
+  const { usuario } = useAuth()
+  if (usuario?.rol === 'CLIENTE') return <Navigate to="/cliente" replace />
+  return <Layout />
 }
 
 export default function App() {
@@ -55,7 +64,7 @@ export default function App() {
             <Route
               element={
                 <RutaProtegida>
-                  <Layout />
+                  <ZonaPersonal />
                 </RutaProtegida>
               }
             >
@@ -71,6 +80,7 @@ export default function App() {
               <Route path="turnos" element={<Turnos />} />
               <Route path="tarifas" element={<SoloAdmin><Tarifas /></SoloAdmin>} />
               <Route path="usuarios" element={<SoloAdmin><Usuarios /></SoloAdmin>} />
+              <Route path="personas" element={<SoloAdmin><Personas /></SoloAdmin>} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Route>
           </Routes>

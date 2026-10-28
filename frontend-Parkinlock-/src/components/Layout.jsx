@@ -13,6 +13,7 @@ const NAVEGACION = [
   { ruta: '/reservas', texto: 'Reservas', icono: '📅' },
   { ruta: '/mensualidades', texto: 'Mensualidades', icono: '🗓' },
   { ruta: '/clientes', texto: 'Clientes', icono: '👤' },
+  { ruta: '/personas', texto: 'Personas', icono: '☰', admin: true },
   { ruta: '/historial', texto: 'Historial', icono: '☰' },
   { ruta: '/alertas', texto: 'Alertas', icono: '!' },
   { ruta: '/turnos', texto: 'Turnos', icono: '⏱' },
@@ -64,7 +65,7 @@ export function Layout() {
             </div>
           </div>
           <button className="btn btn-oscuro btn-bloque" onClick={() => logout()}>
-            Cerrar sesión
+            ← Volver al ingreso
           </button>
         </div>
       </aside>
@@ -77,6 +78,9 @@ export function Layout() {
           <div className="topbar-turno">
             <small>Turno</small> <TurnoResumen turno={turno} />
           </div>
+          <button type="button" className="btn btn-sm" onClick={() => logout()}>
+            ← Volver
+          </button>
           <Reloj />
         </header>
         <main className="contenido">

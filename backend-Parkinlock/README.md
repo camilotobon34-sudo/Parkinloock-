@@ -43,11 +43,7 @@ backend-Parkinlock/
 
 3. Copiar `.env.example` como `.env` y completar los valores. El archivo `.env` no se sube a Git.
 
-4. El administrador inicial es Loren Orozco Vargas (`lorozcovargas210@gmail.com`) y ya puede iniciar sesión. El trabajador de prueba sigue con `contrasena_hash = '<hash>'` hasta asignarle una clave:
-
-   ```bash
-   npm run usuarios:contrasena -- trabajador "OtraClaveSegura"
-   ```
+4. El administrador inicial es Loren Orozco Vargas (`lorozcovargas210@gmail.com`) y el trabajador de prueba es `trabajador`. Ambos ya pueden iniciar sesión.
 
 5. Iniciar el servidor:
 

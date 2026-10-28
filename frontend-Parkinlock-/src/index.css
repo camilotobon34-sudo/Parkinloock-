@@ -799,6 +799,16 @@ nav {
   padding: 0.4rem 0.8rem;
   flex: none;
 }
+.roles-login {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.roles-login button {
+  white-space: normal;
+  line-height: 1.2;
+  padding: 0.55rem 0.3rem;
+  font-size: 0.9rem;
+}
 .filtros {
   display: flex;
   gap: 0.7rem;
@@ -1112,6 +1122,49 @@ nav {
   font-size: 0.85rem;
   color: var(--muted);
 }
+button.kiosco-salir {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+.datos-cliente {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 0.45rem 0.8rem;
+  margin: 0.4rem 0 0;
+}
+.datos-cliente dt {
+  color: var(--muted);
+}
+.datos-cliente dd {
+  margin: 0;
+  font-weight: 600;
+}
+.zona-cliente {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.zona-cliente h1 {
+  text-align: left;
+}
+.cliente-resultado {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-align: left;
+  background: var(--amarillo-suave);
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+}
+.zona-espacios,
+.zona-tarifas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  text-align: left;
+}
 .kiosco-tarjeta {
   width: 100%;
   max-width: 620px;
@@ -1126,6 +1179,10 @@ nav {
 }
 .kiosco-tarjeta h1 {
   font-size: 1.9rem;
+}
+.kiosco-tarjeta.kiosco-tarjeta-cliente {
+  max-width: 860px;
+  text-align: left;
 }
 .kiosco-placa {
   font-family: var(--mono);

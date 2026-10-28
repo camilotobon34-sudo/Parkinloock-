@@ -191,7 +191,8 @@ CREATE TABLE IF NOT EXISTS alertas (
 -- -------------------------------------------------------------
 INSERT INTO roles (nombre, descripcion) VALUES
   ('ADMINISTRADOR', 'Configura tarifas, usuarios y permisos'),
-  ('TRABAJADOR',    'Opera entradas, salidas y cobros')
+  ('TRABAJADOR',    'Opera entradas, salidas y cobros'),
+  ('CLIENTE',       'Ingresa con su usuario, nombre y correo')
 ON DUPLICATE KEY UPDATE nombre = nombre;
 
 INSERT INTO permisos (id_rol, area, nivel_acceso)
@@ -251,7 +252,7 @@ INSERT INTO usuarios (id_rol, nombre_completo, usuario, correo, contrasena_hash)
 SELECT r.id_rol, u.nombre_completo, u.usuario, u.correo, u.contrasena_hash
 FROM (
   SELECT 'ADMINISTRADOR' AS rol, 'Loren Orozco Vargas' AS nombre_completo, 'lorozcovargas210@gmail.com' AS usuario, 'lorozcovargas210@gmail.com' AS correo, '$2b$10$wJ2jfAiSs9otaRGPmwkiE.x06/oxKmgZ5oyCS052MS1QFjwydWbUy' AS contrasena_hash
-  UNION ALL SELECT 'TRABAJADOR', 'Trabajador de prueba', 'trabajador', NULL, '<hash>'
+  UNION ALL SELECT 'TRABAJADOR', 'Trabajador de prueba', 'trabajador', NULL, '$2b$10$OfLiddI46Lg01jOvL5N7Wu5IGafZpe//uOY8XlKQMHbwifqruNA8e'
 ) AS u
 JOIN roles r ON r.nombre = u.rol
 ON DUPLICATE KEY UPDATE usuario = usuarios.usuario;

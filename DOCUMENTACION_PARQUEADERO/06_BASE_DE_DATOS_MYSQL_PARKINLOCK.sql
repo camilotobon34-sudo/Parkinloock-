@@ -187,7 +187,8 @@ CREATE INDEX idx_espacio_estado ON espacios (estado, id_tipo_vehiculo);
 -- -------------------------------------------------------------
 INSERT INTO roles (nombre, descripcion) VALUES
   ('ADMINISTRADOR', 'Configura tarifas, usuarios y permisos'),
-  ('TRABAJADOR',    'Opera entradas, salidas y cobros');
+  ('TRABAJADOR',    'Opera entradas, salidas y cobros'),
+  ('CLIENTE',       'Ingresa con su usuario, nombre y correo');
 
 INSERT INTO permisos (id_rol, area, nivel_acceso) VALUES
   (1,'PANEL','Ver y editar'),        (2,'PANEL','Ver'),
@@ -212,4 +213,4 @@ INSERT INTO espacios (codigo, id_tipo_vehiculo) VALUES
 
 INSERT INTO usuarios (id_rol, nombre_completo, usuario, correo, contrasena_hash) VALUES
   (1, 'Loren Orozco Vargas', 'lorozcovargas210@gmail.com', 'lorozcovargas210@gmail.com', '$2b$10$wJ2jfAiSs9otaRGPmwkiE.x06/oxKmgZ5oyCS052MS1QFjwydWbUy'),
-  (2, 'Trabajador de prueba', 'trabajador', NULL, '<hash>');
+  (2, 'Trabajador de prueba', 'trabajador', NULL, '$2b$10$OfLiddI46Lg01jOvL5N7Wu5IGafZpe//uOY8XlKQMHbwifqruNA8e');
