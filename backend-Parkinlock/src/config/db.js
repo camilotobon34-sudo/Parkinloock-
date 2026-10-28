@@ -33,6 +33,7 @@ function toSqliteSql(sql) {
   s = s.replace(/\bLEAST\s*\(/gi, 'min(')
   s = s.replace(/DATE_FORMAT\s*\(\s*([^,]+)\s*,\s*'%Y-%m-%d'\s*\)/gi, 'strftime(\'%Y-%m-%d\', $1)')
   s = s.replace(/DATE_FORMAT\s*\(\s*([^,]+)\s*,\s*'%Y-%m-%d %H:%i:%s'\s*\)/gi, 'strftime(\'%Y-%m-%d %H:%M:%S\', $1)')
+  s = s.replace(/\bDATE\s*\(/gi, 'date(')
   s = s.replace(/FIELD\(([^,]+),\s*([\s\S]*?)\)/gi, (_, col, list) => {
     const parts = list.split(',').map((p) => p.trim()).filter(Boolean)
     return `CASE ${col.trim()} ${parts.map((p, i) => `WHEN ${p} THEN ${i}`).join(' ')} ELSE 999 END`
@@ -183,6 +184,10 @@ function initSqlite() {
       estado TEXT NOT NULL DEFAULT 'ACTIVA',
       FOREIGN KEY (id_reserva) REFERENCES reservas(id_reserva)
     );
+    CREATE TABLE IF NOT EXISTS meta (
+      clave TEXT PRIMARY KEY,
+      valor TEXT NOT NULL
+    );
   `)
 
   const seed = () => {
@@ -242,6 +247,102 @@ function initSqlite() {
     )
     insUser.run(idRol.ADMINISTRADOR, 'Loren Orozco Vargas', 'lorozcovargas210@gmail.com', 'lorozcovargas210@gmail.com', adminHash)
     insUser.run(idRol.TRABAJADOR, 'Trabajador de prueba', 'trabajador', null, trabHash)
+
+    const yaDemo = sqlite.prepare(`SELECT valor FROM meta WHERE clave = 'demo_operacion_v1'`).get()
+    if (!yaDemo) {
+      const pad = (n) => String(n).padStart(2, '0')
+      const fechaDe = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+      const base = new Date()
+      base.setHours(12, 0, 0, 0)
+      const dia = (offset) => {
+        const d = new Date(base)
+        d.setDate(d.getDate() + offset)
+        return fechaDe(d)
+      }
+
+      sqlite.exec('BEGIN')
+      try {
+        const admin = sqlite.prepare(`SELECT id_usuario FROM usuarios WHERE usuario = ?`).get('lorozcovargas210@gmail.com')
+        const trab = sqlite.prepare(`SELECT id_usuario FROM usuarios WHERE usuario = ?`).get('trabajador')
+        const idAdmin = admin?.id_usuario
+        const idTrab = trab?.id_usuario
+
+        sqlite.prepare(`INSERT OR IGNORE INTO clientes (id_cliente, nombre, telefono) VALUES (1, ?, ?)`).run('Ana Pérez', '3001112233')
+        sqlite.prepare(`INSERT OR IGNORE INTO clientes (id_cliente, nombre, telefono) VALUES (2, ?, ?)`).run('Carlos Ruiz', '3014445566')
+        sqlite.prepare(`INSERT OR IGNORE INTO clientes (id_cliente, nombre, telefono) VALUES (3, ?, ?)`).run('María López', '3027778899')
+
+        sqlite
+          .prepare(`INSERT OR IGNORE INTO vehiculos (id_vehiculo, placa, id_tipo_vehiculo, id_cliente) VALUES (1, ?, ?, 1)`)
+          .run('ABC123', idTipo.CARRO)
+        sqlite
+          .prepare(`INSERT OR IGNORE INTO vehiculos (id_vehiculo, placa, id_tipo_vehiculo, id_cliente) VALUES (2, ?, ?, 2)`)
+          .run('XYZ987', idTipo.CARRO)
+        sqlite
+          .prepare(`INSERT OR IGNORE INTO vehiculos (id_vehiculo, placa, id_tipo_vehiculo, id_cliente) VALUES (3, ?, ?, 3)`)
+          .run('MOTO45', idTipo.MOTO)
+
+        const esp = Object.fromEntries(
+          sqlite.prepare(`SELECT codigo, id_espacio FROM espacios`).all().map((e) => [e.codigo, e.id_espacio]),
+        )
+
+        if (idAdmin && idTrab && esp['C-01'] && esp['C-02'] && esp['M-01']) {
+          const insTurno = sqlite.prepare(
+            `INSERT INTO turnos (id_usuario, caja, inicio_programado, fin_programado, caja_inicial, estado)
+             VALUES (?, ?, ?, ?, ?, 'CERRADO')`,
+          )
+          const insMov = sqlite.prepare(
+            `INSERT INTO movimientos
+              (id_vehiculo, id_espacio, id_turno_entrada, id_turno_salida, fecha_hora_entrada, fecha_hora_salida, minutos, valor_total, estado)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'FINALIZADO')`,
+          )
+          const insPago = sqlite.prepare(
+            `INSERT INTO pagos (id_movimiento, id_reserva, id_mensualidad, id_turno, metodo, valor, efectivo_recibido, cambio, fecha_hora)
+             VALUES (?, NULL, NULL, ?, 'EFECTIVO', ?, ?, ?, ?)`,
+          )
+          const insReserva = sqlite.prepare(
+            `INSERT INTO reservas (id_vehiculo, id_cliente, id_espacio, id_usuario, fecha, hora_inicio, hora_fin, estado)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          )
+
+          const turnosDemo = [
+            { user: idTrab, caja: 'Caja 1', d: -3 },
+            { user: idTrab, caja: 'Caja 1', d: -2 },
+            { user: idAdmin, caja: 'Caja 1', d: -1 },
+          ]
+          const idsTurno = turnosDemo.map((t) => {
+            const f = dia(t.d)
+            const info = insTurno.run(t.user, t.caja, `${f} 07:00:00`, `${f} 15:00:00`, 50000)
+            return Number(info.lastInsertRowid)
+          })
+
+          const hist = [
+            { turno: idsTurno[0], veh: 1, esp: esp['C-01'], d: -3, ent: '08:10:00', sal: '10:25:00', min: 135, valor: 15000, ef: 20000 },
+            { turno: idsTurno[0], veh: 3, esp: esp['M-01'], d: -3, ent: '09:00:00', sal: '11:00:00', min: 120, valor: 6000, ef: 10000 },
+            { turno: idsTurno[1], veh: 2, esp: esp['C-02'], d: -2, ent: '08:40:00', sal: '12:10:00', min: 210, valor: 20000, ef: 20000 },
+            { turno: idsTurno[1], veh: 1, esp: esp['C-01'], d: -2, ent: '13:00:00', sal: '14:30:00', min: 90, valor: 10000, ef: 10000 },
+            { turno: idsTurno[2], veh: 3, esp: esp['M-01'], d: -1, ent: '07:30:00', sal: '09:15:00', min: 105, valor: 6000, ef: 10000 },
+            { turno: idsTurno[2], veh: 2, esp: esp['C-02'], d: -1, ent: '10:00:00', sal: '13:45:00', min: 225, valor: 20000, ef: 50000 },
+          ]
+          for (const h of hist) {
+            const f = dia(h.d)
+            const mov = insMov.run(h.veh, h.esp, h.turno, h.turno, `${f} ${h.ent}`, `${f} ${h.sal}`, h.min, h.valor)
+            const idMov = Number(mov.lastInsertRowid)
+            insPago.run(idMov, h.turno, h.valor, h.ef, h.ef - h.valor, `${f} ${h.sal}`)
+          }
+
+          // Reservas futuras para poder crear/confirmar en cualquier hora del día.
+          insReserva.run(1, 1, esp['C-01'], idAdmin, dia(1), '09:00:00', '11:00:00', 'PENDIENTE')
+          insReserva.run(3, 3, esp['M-01'], idAdmin, dia(1), '14:00:00', '16:00:00', 'PENDIENTE')
+          insReserva.run(2, 2, esp['C-02'], idAdmin, dia(2), '10:00:00', '12:00:00', 'PENDIENTE')
+        }
+
+        sqlite.prepare(`INSERT INTO meta (clave, valor) VALUES ('demo_operacion_v1', '1')`).run()
+        sqlite.exec('COMMIT')
+      } catch (err) {
+        sqlite.exec('ROLLBACK')
+        throw err
+      }
+    }
   }
 
   seed()

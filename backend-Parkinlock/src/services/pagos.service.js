@@ -48,8 +48,25 @@ export async function obtener(actor, idPago) {
 export function listar(q = {}) {
   const { limit, offset } = paginacion(q)
   const dia = fecha(q.fecha, 'fecha', { requerido: false })
+  const desde = fecha(q.desde, 'desde', { requerido: false })
+  const hasta = fecha(q.hasta, 'hasta', { requerido: false })
+  const filtros = []
+  const params = []
+  if (dia) {
+    filtros.push('DATE(p.fecha_hora) = ?')
+    params.push(dia)
+  } else {
+    if (desde) {
+      filtros.push('DATE(p.fecha_hora) >= ?')
+      params.push(desde)
+    }
+    if (hasta) {
+      filtros.push('DATE(p.fecha_hora) <= ?')
+      params.push(hasta)
+    }
+  }
   return query(
-    `${SELECT_PAGO} ${dia ? 'WHERE DATE(p.fecha_hora) = ?' : ''} ORDER BY p.fecha_hora DESC LIMIT ? OFFSET ?`,
-    dia ? [dia, limit, offset] : [limit, offset],
+    `${SELECT_PAGO} ${filtros.length ? `WHERE ${filtros.join(' AND ')}` : ''} ORDER BY p.fecha_hora DESC LIMIT ? OFFSET ?`,
+    [...params, limit, offset],
   )
 }

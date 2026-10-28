@@ -160,9 +160,20 @@ export function historial(actor, q = {}) {
     params.push(placaValida(q.placa))
   }
   const dia = fecha(q.fecha, 'fecha', { requerido: false })
+  const desde = fecha(q.desde, 'desde', { requerido: false })
+  const hasta = fecha(q.hasta, 'hasta', { requerido: false })
   if (dia) {
     filtros.push('DATE(m.fecha_hora_entrada) = ?')
     params.push(dia)
+  } else {
+    if (desde) {
+      filtros.push('DATE(m.fecha_hora_entrada) >= ?')
+      params.push(desde)
+    }
+    if (hasta) {
+      filtros.push('DATE(m.fecha_hora_entrada) <= ?')
+      params.push(hasta)
+    }
   }
   if (actor.rol !== 'ADMINISTRADOR') {
     filtros.push('(te.id_usuario = ? OR ts.id_usuario = ?)')

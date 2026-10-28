@@ -3,18 +3,35 @@ import { movimientos, pagos } from '../api/index.js'
 import { Cabecera, Cargando, EstadoBadge, MensajeError, Vacio } from '../components/ui.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useCarga } from '../hooks/useCarga.js'
-import { dinero, duracion, exportarCSV, fechaHora, hora, NOMBRE_TIPO, normalizarPlaca } from '../utils/format.js'
+import { dinero, duracion, exportarCSV, fechaHora, fechaISO, hora, NOMBRE_TIPO, normalizarPlaca, sumarDias } from '../utils/format.js'
+
+function rangoUltimosDias(dias) {
+  return { fecha: '', desde: sumarDias(-(dias - 1)), hasta: fechaISO() }
+}
 
 export default function Historial() {
   const { esAdmin } = useAuth()
   const [vista, setVista] = useState('movimientos')
   const [placa, setPlaca] = useState('')
-  const [filtros, setFiltros] = useState({ placa: '', fecha: '' })
+  const [filtros, setFiltros] = useState(() => ({ placa: '', ...rangoUltimosDias(7) }))
+  const [rapido, setRapido] = useState('7d')
   const datos = useCarga(
-    () => (vista === 'pagos' ? pagos.listar({ fecha: filtros.fecha, limit: 200 }) : movimientos.historial({ ...filtros, limit: 200 })),
+    () =>
+      vista === 'pagos'
+        ? pagos.listar({ fecha: filtros.fecha, desde: filtros.desde, hasta: filtros.hasta, limit: 200 })
+        : movimientos.historial({ ...filtros, limit: 200 }),
     [vista, filtros],
   )
   const lista = datos.data ?? []
+
+  function aplicarRapido(clave) {
+    setRapido(clave)
+    setPlaca('')
+    if (clave === 'hoy') setFiltros({ placa: '', fecha: fechaISO(), desde: '', hasta: '' })
+    else if (clave === 'ayer') setFiltros({ placa: '', fecha: sumarDias(-1), desde: '', hasta: '' })
+    else if (clave === '7d') setFiltros({ placa: '', ...rangoUltimosDias(7) })
+    else setFiltros({ placa: '', fecha: '', desde: '', hasta: '' })
+  }
 
   function exportar() {
     if (vista === 'pagos') {
@@ -60,23 +77,57 @@ export default function Historial() {
             </button>
           </div>
         )}
+        <div className="segmentado compacto">
+          <button type="button" className={rapido === 'hoy' ? 'activo' : ''} onClick={() => aplicarRapido('hoy')}>
+            Hoy
+          </button>
+          <button type="button" className={rapido === 'ayer' ? 'activo' : ''} onClick={() => aplicarRapido('ayer')}>
+            Ayer
+          </button>
+          <button type="button" className={rapido === '7d' ? 'activo' : ''} onClick={() => aplicarRapido('7d')}>
+            Últimos 7 días
+          </button>
+          <button type="button" className={rapido === 'todo' ? 'activo' : ''} onClick={() => aplicarRapido('todo')}>
+            Todo
+          </button>
+        </div>
         <form
           onSubmit={(e) => {
             e.preventDefault()
-            setFiltros({ ...filtros, placa: normalizarPlaca(placa) })
+            setRapido('custom')
+            setFiltros({
+              placa: normalizarPlaca(placa),
+              fecha: '',
+              desde: filtros.desde,
+              hasta: filtros.hasta,
+            })
           }}
         >
           {vista === 'movimientos' && <input value={placa} onChange={(e) => setPlaca(e.target.value.toUpperCase())} placeholder="Placa" />}
-          <input type="date" value={filtros.fecha} onChange={(e) => setFiltros({ ...filtros, fecha: e.target.value })} />
+          <label>
+            Desde{' '}
+            <input
+              type="date"
+              value={filtros.desde || filtros.fecha || ''}
+              onChange={(e) => {
+                setRapido('custom')
+                setFiltros({ ...filtros, fecha: '', desde: e.target.value, hasta: filtros.hasta || fechaISO() })
+              }}
+            />
+          </label>
+          <label>
+            Hasta{' '}
+            <input
+              type="date"
+              value={filtros.hasta || filtros.fecha || ''}
+              onChange={(e) => {
+                setRapido('custom')
+                setFiltros({ ...filtros, fecha: '', hasta: e.target.value, desde: filtros.desde || e.target.value })
+              }}
+            />
+          </label>
           <button className="btn">Filtrar</button>
-          <button
-            type="button"
-            className="btn"
-            onClick={() => {
-              setPlaca('')
-              setFiltros({ placa: '', fecha: '' })
-            }}
-          >
+          <button type="button" className="btn" onClick={() => aplicarRapido('7d')}>
             Limpiar
           </button>
         </form>
@@ -86,7 +137,7 @@ export default function Historial() {
         {datos.cargando && !datos.data ? (
           <Cargando />
         ) : !lista.length ? (
-          <Vacio>Sin resultados.</Vacio>
+          <Vacio>Sin resultados para el rango seleccionado.</Vacio>
         ) : vista === 'pagos' && lista[0]?.id_pago !== undefined ? (
           <div className="tabla-envoltura">
             <table className="tabla">

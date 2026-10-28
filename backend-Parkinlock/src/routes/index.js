@@ -1,5 +1,4 @@
 import { Router } from 'express'
-import { getPool } from '../config/db.js'
 import { autenticar } from '../middleware/auth.js'
 import auth from './auth.routes.js'
 import clientes from './clientes.routes.js'
@@ -16,7 +15,8 @@ import vehiculos from './vehiculos.routes.js'
 const router = Router()
 
 router.get('/salud', async (_req, res) => {
-  await getPool().query('SELECT 1')
+  const { query } = await import('../config/db.js')
+  await query('SELECT 1 AS ok')
   res.json({ estado: 'ok', base_de_datos: 'conectada' })
 })
 router.use('/auth', auth)

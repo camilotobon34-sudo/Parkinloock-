@@ -102,6 +102,13 @@ export async function confirmar(actor, idReserva, body = {}) {
       efectivoRecibido: body.efectivo_recibido,
     })
     await query(`UPDATE reservas SET estado = 'CONFIRMADA' WHERE id_reserva = ?`, [reservaId], conn)
+    if (r.id_espacio) {
+      await query(
+        `UPDATE espacios SET estado = 'RESERVADO' WHERE id_espacio = ? AND estado = 'DISPONIBLE'`,
+        [r.id_espacio],
+        conn,
+      )
+    }
     return { reserva: await porId(reservaId, conn), pago }
   })
 }

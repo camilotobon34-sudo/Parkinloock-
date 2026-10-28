@@ -18,13 +18,20 @@ export function fechaHoraInput(d = new Date()) {
 
 export function hora(v) {
   if (!v) return '—'
-  const d = new Date(v)
+  const raw = typeof v === 'string' && v.includes(' ') && !v.includes('T') ? v.replace(' ', 'T') : v
+  const d = new Date(raw)
+  if (Number.isNaN(d.getTime())) return String(v).slice(11, 16) || '—'
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
 export function fechaCorta(v) {
   if (!v) return '—'
-  const d = typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) ? new Date(`${v}T00:00:00`) : new Date(v)
+  if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) {
+    return new Date(`${v}T00:00:00`).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
+  }
+  const raw = typeof v === 'string' && v.includes(' ') && !v.includes('T') ? v.replace(' ', 'T') : v
+  const d = new Date(raw)
+  if (Number.isNaN(d.getTime())) return String(v).slice(0, 10)
   return d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
